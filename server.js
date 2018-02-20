@@ -32,7 +32,7 @@
     var str = mongoose.model('str', {
         date : Date,
         wordlist : Array,
-    });
+    }, 'strs');
 
     var recentWordCount = mongoose.model('recentWordCount', {
         _id : String,
@@ -57,20 +57,6 @@
 
 
 // API Section
-
-    // get all Users
-    app.get('/api/user', function(req, res) {
-        
-        // use mongoose to get all Users in the database
-        User.find(function(err, user) {
-
-            // if there is an error retrieving, send the error. nothing after res.send(err) will execute
-            if (err)
-                res.send(err)
-
-            res.json(user); // return all todos in JSON format
-        });
-    });
 
 //Get Word lists from database
     app.get('/api/data', function(req, res) {

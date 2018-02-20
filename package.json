@@ -4,20 +4,17 @@
   "description"  : "Haystax - Interview.",
   "main"         : "server.js",
   "author"       : "Raymond Anselmo",
-  "dependencies" : {
-    "express"    : "~4.7.2",
-    "mongoose"   : "~3.6.2",
-    "morgan"     : "~1.2.2",
-    "body-parser": "~1.5.2",
-    "method-override": "~2.1.2",
+  "dependencies": {
     "angular-route": "1.3.x",
-    "request":"latest",
+    "body-parser": "~1.5.2",
+    "check-word": "latest",
     "cors": "^2.8.0",
-    "check-word" : "latest",
-    "mongodb" : "latest"
-    },
-  "scripts" : { "start" : "node server.js" },
-    "engines": {
-    "node": "6.9.1"
-  }
+    "express": "~4.7.2",
+    "method-override": "~2.1.2",
+    "mongodb": "latest",
+    "mongoose": "latest",
+    "morgan": "~1.2.2",
+    "request": "latest"
+  },
+  "scripts" : { "start" : "node server.js" }
 }

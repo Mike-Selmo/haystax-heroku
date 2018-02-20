@@ -12,8 +12,9 @@
     "method-override": "~2.1.2",
     "angular-route": "1.3.x",
     "request":"latest",
-          "cors": "^2.8.0",
-    "check-word" : "latest"
+    "cors": "^2.8.0",
+    "check-word" : "latest",
+    "mongodb" : "latest"
     },
   "scripts" : { "start" : "node server.js" },
     "engines": {

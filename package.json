@@ -15,5 +15,8 @@
           "cors": "^2.8.0",
     "check-word" : "latest"
     },
-  "scripts" : { "start" : "node server.js" }
+  "scripts" : { "start" : "node server.js" },
+    "engines": {
+    "node": "6.9.1"
+  }
 }

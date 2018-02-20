@@ -13,7 +13,7 @@
     
     var bearertoken=''; //bearerToken will be set when initializing API call to Twitter.
 
-    mongoose.connect(process.env.MONGODB_URI, function (err, res) {
+    mongoose.connect(process.env.MONGODB_URI, {auth:{authdb:"admin"}}, function (err, res) {
       if (err) {
       console.log ('ERROR connecting to: ' + process.env.MONGODB_URI + '. ' + err);
       } else {

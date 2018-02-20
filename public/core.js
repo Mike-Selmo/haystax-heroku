@@ -29,7 +29,7 @@ function mongoController($scope, $http) {
     $scope.stepFour = false;  
     
     // when landing on the page, get all data
-    $http.get('/api/data')
+    $http.get('./api/data')
         .success(function(data) {
         $scope.mongoCollections = data;
             console.log($scope.mongoCollections );

@@ -13,7 +13,7 @@
     
     var bearertoken=''; //bearerToken will be set when initializing API call to Twitter.
 
-    mongoose.connect('mongodb://localhost:27017/haystax-interview');  //Connect to MongoDB
+    mongoose.connect(MONGODB_URI);  //Connect to MongoDB
 
     app.use(express.static(__dirname + '/public')); //Direct to client side directory.       
     app.use(morgan('dev'));                                     

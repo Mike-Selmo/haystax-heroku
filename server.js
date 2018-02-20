@@ -13,7 +13,7 @@
     
     var bearertoken=''; //bearerToken will be set when initializing API call to Twitter.
 
-    mongoose.connect(process.env.MONGODB_URI, {auth:{authdb:"admin"}}, function (err, res) {
+    mongoose.connect(process.env.MONGODB_URI,{auth:{authdb:"admin"}}, function (err, res) {
       if (err) {
       console.log ('ERROR connecting to: ' + process.env.MONGODB_URI + '. ' + err);
       } else {
@@ -21,7 +21,7 @@
       }
     }); //Connect to MongoDB
 
-    app.use(express.static(__dirname + '/public')); //Direct to client side directory.       
+ app.use(express.static(__dirname + '/public')); //Direct to client side directory.       
     app.use(morgan('dev'));                                     
     app.use(bodyParser.urlencoded({'extended':'true'}));      
     app.use(bodyParser.json());                               
@@ -38,7 +38,7 @@
     var str = mongoose.model('str', {
         date : Date,
         wordlist : Array,
-    }, 'strs');
+    });
 
     var recentWordCount = mongoose.model('recentWordCount', {
         _id : String,
@@ -63,6 +63,20 @@
 
 
 // API Section
+
+    // get all Users
+    app.get('/api/user', function(req, res) {
+        
+        // use mongoose to get all Users in the database
+        User.find(function(err, user) {
+
+            // if there is an error retrieving, send the error. nothing after res.send(err) will execute
+            if (err)
+                res.send(err)
+
+            res.json(user); // return all todos in JSON format
+        });
+    });
 
 //Get Word lists from database
     app.get('/api/data', function(req, res) {
@@ -125,7 +139,11 @@
                 if (err){
                     res.send(err)
                 }
-           trendingWords()
+                 trendingWordCount.remove({}, function(err) { 
+              console.log('collection removed') 
+          });
+          addNewWords();
+          subOldWords();
             res.json(dataSort(recentWordCount));
             });
         
@@ -138,6 +156,7 @@
                 if (err){
                     res.send(err)
                 }
+ 
             res.json(dataSort(trendingWordCount));
             });
         
@@ -147,8 +166,6 @@
 //This will sort the data in descending word count. 
 function dataSort(data){
 data.sort(function(a, b) { return b.value - a.value; });
-
-console.log(data);
 return data;
 }
 
@@ -159,7 +176,7 @@ o.map = function () {
     var d = new Date();
     d.setDate(d.getDate() - 1); 
     if(this.date>=d){
-    for(var i =0; i< this.wordlist.length - 1; i++){
+    for(var i =0; i< this.wordlist.length; i++){
     emit(this.wordlist[i], 1)
     }
     } 
@@ -183,7 +200,7 @@ o.map = function () {
     d3.setDate(d3.getDate() - 2); 
                 
     if(this.date<=d2&&this.date<=d3){
-    for(var i =0; i< this.wordlist.length - 1; i++){
+    for(var i =0; i< this.wordlist.length; i++){
     emit(this.wordlist[i], 1)
     }
     }
@@ -197,7 +214,7 @@ str.mapReduce(o, function (err, results) {
 function allWords(){
  var o = {};
 o.map = function () { 
-    for(var i =0; i< this.wordlist.length - 1; i++){
+    for(var i =0; i< this.wordlist.length; i++){
     emit(this.wordlist[i], 1)} }
 o.out = {replace: 'totalWordCounts'}
 
@@ -206,7 +223,7 @@ str.mapReduce(o, function (err, results) {
 })
 }
 
-//Now we reduce the 2 collections subtracting 24 hours word count, with previous 24 hour word count and output to a collection
+/*//Now we reduce the 2 collections subtracting 24 hours word count, with previous 24 hour word count and output to a collection
 function trendingWords(){
 trendingWordCount.remove({}, function(err) { 
    console.log('collection removed') 
@@ -214,25 +231,79 @@ trendingWordCount.remove({}, function(err) {
  var o = {};
 o.map = function () { 
     emit(this._id, this.value)}
-o.out = {reduce: 'trendingWords'}
+o.out = {replace: 'trendingWords'}
 
 o.reduce = function (k, vals) {
-    var values = 0;
-    values +=vals[1];
-    values -=vals[0]
-return values;
+return vals;
 }
 recentWordCount.mapReduce(o, function (err, results) {
 })
+}
+
+function trendingWordsFinal(){
+ var o = {};
+o.map = function () { 
+    emit(this._id, this.value)}
+o.out = {reduce: 'trendingWords'}
+
+o.reduce = function (k, vals) {
+ var result = {value:0};
+vals.forEach(function (value) {vals.value -= vals.value;});
+
+return result;
+}
 oldWordCount.mapReduce(o, function (err, results) {
+})
+}*/
+
+function addNewWords(){
+ var o = {};
+o.map = function () { 
+    var d = new Date();
+    d.setDate(d.getDate() - 1); 
+    if(this.date>=d){
+    for(var i =0; i< this.wordlist.length; i++){
+    emit(this.wordlist[i], 1)
+    }
+    } 
+}
+
+o.out = {reduce: 'trendingWords'}
+
+o.reduce = function (k, vals) { return vals.length }
+str.mapReduce(o, function (err, results) {
+})
+
+}
+
+function subOldWords(){
+ var o = {};
+o.map = function () { 
+    var d2 = new Date();
+    var d3 = new Date();
+
+    d2.setDate(d2.getDate() - 1); 
+    d3.setDate(d3.getDate() - 2); 
+                
+    if(this.date<=d2&&this.date<=d3){
+    for(var i =0; i< this.wordlist.length; i++){
+    emit(this.wordlist[i], -1)
+    }
+    }
+}
+o.out = {reduce: 'trendingWords'}
+o.reduce = function (k, vals) { return vals.length }
+str.mapReduce(o, function (err, results) {
 })
 }
 
 
     app.get('/api/twitter', function(req, res) {
         
+        
+    obj = JSON.parse(req.query.handle);
        var options = {
-    url: 'https://api.twitter.com/1.1/search/tweets.json?q='+req.body.handle+'&count=5',
+    url: 'https://api.twitter.com/1.1/search/tweets.json?q=from:'+obj.handle+'&count=5',
     headers: {
         'Authorization': 'bearer ' + bearertoken,
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
@@ -318,11 +389,9 @@ oldWordCount.mapReduce(o, function (err, results) {
 
 request.post(options, function(error, response, body) {
     bearertoken= JSON.parse(body).access_token;
-    console.log(bearertoken);
 });
         res.sendfile('./public/twitter.html'); // load the single view file (angular will handle the page changes on the front-end)
     });
-
 
     app.listen(process.env.PORT);
     console.log("App listening on port:" + process.env.PORT);

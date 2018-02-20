@@ -9,23 +9,21 @@ function loginController($scope, $http) {
 
     // when submitting the add form, send the text to the node API
     $scope.userReg = function() {
-        console.log($scope.formData);
-
             $scope.showform = false;   
             $scope.showthank = true;
             console.log($scope.formData);
     };
 }
 
-
 function mongoController($scope, $http) {
     $scope.stepOne = true;
     $scope.stepTwo = false;  
     $scope.stepThree = false;  
     $scope.stepFour = false;  
+    $scope.stepFive = false;  
     
     // when landing on the page, get all data
-    $http.get('./api/data')
+    $http.get('/api/data')
         .success(function(data) {
         $scope.mongoCollections = data;
             console.log($scope.mongoCollections );
@@ -87,7 +85,11 @@ $scope.getFinal = function() {
             console.log('Error: ' + data);
         });
     };
-    
+ $scope.finalThoughts = function() {
+    $scope.stepFour = false;  
+    $scope.stepFive = true;  
+
+    };   
 }
 
 function twitterController($scope, $http) {
@@ -96,10 +98,22 @@ function twitterController($scope, $http) {
 
     // when landing on the page, get all todos and show them
     $scope.getTweets = function() {
-  $http.get('/api/twitter', $scope.twitterSearch)
+        $scope.results = false;
+        $scope.failure = false;
+        
+    $http.get('/api/twitter', {params: {handle: $scope.twitterSearch}})
         .success(function(data) {
-            console.log(data);
-            $scope.tweets = data.statuses;
+        $scope.handle =  $scope.twitterSearch.handle;
+        $scope.tweets = data.statuses;
+        if(data.statuses.length>0){
+        $scope.results = true;
+              for(var i =0; i<$scope.tweets.length; i++){
+                 $scope.tweets[i].date =new Date($scope.tweets[i].created_at);
+              }
+        }
+        else{
+        $scope.failure = true;  
+        }
         })
         .error(function(data) {
             console.log('Error: ' + data);

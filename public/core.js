@@ -10,17 +10,13 @@ function loginController($scope, $http) {
     // when submitting the add form, send the text to the node API
     $scope.userReg = function() {
         console.log($scope.formData);
-        $http.post('/api/user', $scope.formData)
-            .success(function(data) {
+
             $scope.showform = false;   
             $scope.showthank = true;
             console.log($scope.formData);
-            })
-            .error(function(data) {
-                console.log('Error: ' + data);
-            });
     };
 }
+
 
 function mongoController($scope, $http) {
     $scope.stepOne = true;

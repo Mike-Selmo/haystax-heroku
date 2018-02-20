@@ -13,7 +13,13 @@
     
     var bearertoken=''; //bearerToken will be set when initializing API call to Twitter.
 
-    mongoose.connect(process.env.MONGODB_URI);  //Connect to MongoDB
+    mongoose.connect(process.env.MONGODB_URI, function (err, res) {
+      if (err) {
+      console.log ('ERROR connecting to: ' + process.env.MONGODB_URI + '. ' + err);
+      } else {
+      console.log ('Succeeded connected to: ' + process.env.MONGODB_URI);
+      }
+    }); //Connect to MongoDB
 
     app.use(express.static(__dirname + '/public')); //Direct to client side directory.       
     app.use(morgan('dev'));                                     

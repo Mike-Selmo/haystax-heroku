@@ -14,7 +14,5 @@
     "request":"latest",
           "cors": "^2.8.0"
     },
-    scripts: {
-    "start": "node server.js"
-}
+  "scripts" : { "start" : "node server.js" }
 }
